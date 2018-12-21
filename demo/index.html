@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+  <title>local-traslate demo</title>
+
+  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
+
+  <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+  <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+  <link rel="import" href="../local-traslate.html">
+
+  <custom-style>
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </custom-style>
+</head>
+
+<body>
+  <div class="vertical-section-container centered">
+    <h3>Basic local-traslate demo</h3>
+    <demo-snippet>
+      <template>
+        <local-traslate id="component-traslate" source="locales" on-selected-lang="_setLang"></local-traslate>
+      </template>
+    </demo-snippet>
+    <script>
+      let component = document.querySelector("#component-traslate");
+      component.langList = [
+        {
+          lang: "",
+          langDescription: "Seleccione"
+        },
+        {
+          lang: "es",
+          langDescription: "Español"
+        },
+        {
+          lang: "en",
+          langDescription: "English"
+        },
+        {
+          lang: "jp",
+          langDescription: "日本"
+        },
+        {
+          lang: "fr",
+          langDescription: "Le français"
+        }
+      ];
+      let componentTraslate = document.querySelector("local-traslate");
+      componentTraslate.addEventListener("selected-lang", event => {
+        let langSelected = event.detail;
+        alert(JSON.stringify(langSelected));
+      });
+      componentTraslate.addEventListener("error-resource", event => {
+        alert(event.detail.statusText);
+      })
+    </script>
+  </div>
+</body>
+
+</html>

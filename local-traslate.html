@@ -1,0 +1,111 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+
+<dom-module id="local-traslate">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <iron-ajax id="sourceJSON" handle-as="json" on-response="_getLanguage" on-error="_errorResponse" debounce-duration="300">
+    </iron-ajax>
+    <select id="listLangs" on-change="_getLang">
+      <template is="dom-repeat" items="[[langList]]" as="lang">
+        <option value="[[lang.lang]]">[[lang.langDescription]]</option>
+      </template>
+    </select>
+  </template>
+
+  <script>
+    /**
+     * `local-traslate`
+     * https://github.com/igoodbad/local-traslate.git
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class LocalTraslate extends Polymer.Element {
+      static get is() { return 'local-traslate'; }
+      static get properties() {
+        return {
+          langList: {
+            type: Array,
+            value: () => []
+          },
+          offlineSource: {
+            type: Array,
+            value: () => []
+          },
+          source: {
+            type: String,
+            value: ""
+          },
+          lang: {
+            type: String,
+            value: "",
+            observer: '_langChanged'
+          }
+        };
+      }
+
+      /**
+      * Function 1, set code lang
+      */
+      _getLang(event) {
+        if (event.srcElement.value !== "") {
+          this.set('lang', event.srcElement.value);
+        }
+      }
+
+      /**
+      * Function 2, send request to get a json valid
+      */
+      _langChanged() {
+        this._requestLanguage();
+      }
+
+      /**
+      * Function 3, prepare request to get source from directory
+      */
+      _requestLanguage() {
+        if (this._findSourceOffline().length === 1) {
+          this._getLanguage();
+        } else {
+          this.$.sourceJSON.url = `${this.source}/${this.lang}.json`;
+          this.$.sourceJSON.generateRequest();
+        }
+      }
+
+      /**
+       *Function 4, add source download in a custom Array
+       */
+      _getLanguage() {
+        if (this._findSourceOffline().length !== 1) {
+          this.push("offlineSource", { lang: this.lang, data: this.$.sourceJSON.lastResponse });
+        }
+        this.dispatchEvent(new CustomEvent('selected-lang', {
+          bubbles: false,
+          composed: false,
+          detail: this._findSourceOffline()
+        }));
+      }
+
+      _findSourceOffline() {
+        return this.offlineSource.filter(source => source.lang === this.lang);
+      }
+
+      _errorResponse() {
+        const error = this.$.sourceJSON.lastError;
+        this.dispatchEvent(new CustomEvent('error-resource', {
+          bubbles: false,
+          composed: false,
+          detail: error
+        }));
+      }
+    }
+
+    window.customElements.define(LocalTraslate.is, LocalTraslate);
+  </script>
+</dom-module>
