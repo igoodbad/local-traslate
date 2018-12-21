@@ -1,4 +1,6 @@
-# \<local-traslate\>
+# Local traslate
+
+Component to get source depending the optin selected
 
 https://github.com/igoodbad/local-traslate.git
 
